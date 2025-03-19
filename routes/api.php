@@ -22,38 +22,27 @@ $pedidosController = new PedidosController();
 $pedidoItensController = new PedidoItensController();
 $clientesController = new ClientesController();
 
-// Rotas para produtos
-// Verificação da rota de produtos
-/*
-if ($uri == '/api/produtos' && $method == 'GET') {
-    $produtosController->listar();
-} elseif (preg_match('/\/api\/produtos\/(\d+)/', $uri, $matches) && $method == 'GET') {
-    $produtosController->buscar($matches[1]);
-} elseif ($uri == '/api/produtos' && $method == 'POST') {
-    $produtosController->criar();
-} elseif (preg_match('/\/api\/produtos\/(\d+)/', $uri, $matches) && $method == 'PUT') {
-    $produtosController->atualizar($matches[1]);
-} elseif (preg_match('/\/api\/produtos\/(\d+)/', $uri, $matches) && $method == 'DELETE') {
-    $produtosController->deletar($matches[1]);
-}
-*/
 // Verificar se a URI é exatamente '/api/produtos' com método GET
 if ($uri == '/api/produtos' && $method == 'GET') {
    // echo "Rota de produtos encontrada!";
     $produtosController->listar(); // Chama o método listar() para retornar os produtos
     exit; // Adicionando exit para evitar que o código continue após a resposta
 } elseif (preg_match('/\/api\/produtos\/(\d+)/', $uri, $matches) && $method == 'GET') {
-   echo "Rota de produto específica encontrada!";
+   //echo "Rota de produto específica encontrada!";
     $produtosController->buscar($matches[1]);
+    exit;
 } elseif ($uri == '/api/produtos' && $method == 'POST') {
-    echo "Rota POST de produtos encontrada!";
+    //echo "Rota POST de produtos encontrada!";
     $produtosController->criar();
+    exit;
 } elseif (preg_match('/\/api\/produtos\/(\d+)/', $uri, $matches) && $method == 'PUT') {
-    echo "Rota PUT de produto encontrada!";
+   // echo "Rota PUT de produto encontrada!";
     $produtosController->atualizar($matches[1]);
+    exit;
 } elseif (preg_match('/\/api\/produtos\/(\d+)/', $uri, $matches) && $method == 'DELETE') {
-    echo "Rota DELETE de produto encontrada!";
+    //echo "Rota DELETE de produto encontrada!";
     $produtosController->deletar($matches[1]);
+    exit;
 } else {
     echo "Rota não encontrada!";
 }

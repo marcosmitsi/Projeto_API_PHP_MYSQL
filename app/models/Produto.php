@@ -5,7 +5,7 @@ class Produto {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = getConnection(); // Certifique-se de que está chamando a conexão corretamente!
+        $this->pdo = getConnection(); 
     }
 
     public function listar() {

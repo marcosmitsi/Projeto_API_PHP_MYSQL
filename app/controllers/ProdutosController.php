@@ -18,6 +18,10 @@ class ProdutosController {
 
     public function criar() {
         $data = json_decode(file_get_contents("php://input"), true);
+        if (strlen($data['descricao']) > 100) {
+            echo json_encode(["erro" => "A descrição do produto deve ter no máximo 100 caracteres"]);
+            exit;
+        }
         if ($this->produtoModel->criar($data)) {
             echo json_encode(["mensagem" => "Produto criado com sucesso"]);
         } else {
@@ -27,6 +31,10 @@ class ProdutosController {
 
     public function atualizar($id) {
         $data = json_decode(file_get_contents("php://input"), true);
+        if (strlen($data['descricao']) > 100) {
+            echo json_encode(["erro" => "A descrição do produto deve ter no máximo 255 caracteres"]);
+            exit;
+        }
         if ($this->produtoModel->atualizar($id, $data)) {
             echo json_encode(["mensagem" => "Produto atualizado com sucesso"]);
         } else {

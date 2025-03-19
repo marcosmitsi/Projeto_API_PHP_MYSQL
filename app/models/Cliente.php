@@ -5,7 +5,7 @@ class Cliente {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = getConnection(); // Agora chamamos a função correta!
+        $this->pdo = getConnection(); 
     }
 
     public function listar() {
