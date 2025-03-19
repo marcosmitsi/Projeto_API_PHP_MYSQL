@@ -5,32 +5,67 @@ class PedidoItens {
     private $pdo;
 
     public function __construct() {
-        $this->pdo = getConnection(); // Agora chamamos a função correta!
+        $this->pdo = getConnection(); // Garante que estamos pegando a conexão corretamente
+    }
+
+    public function buscarPrecoProduto($produto_id) {
+        $stmt = $this->pdo->prepare("SELECT preco FROM produtos WHERE id = ?");
+        $stmt->execute([$produto_id]);
+        $produto = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($produto) {
+            return $produto['preco'];
+        }
+
+        return null; // Caso o produto não seja encontrado
+    }
+
+
+    public function adicionarItem($data) {
+        try {
+            $stmt = $this->pdo->prepare("INSERT INTO pedido_itens (pedido_id, produto_id, quantidade, preco) VALUES (?, ?, ?, ?)");
+            $stmt->execute([
+                $data['pedido_id'], 
+                $data['produto_id'], 
+                $data['quantidade'], 
+                $data['preco']
+            ]);
+
+            return ["mensagem" => "Item adicionado ao pedido com sucesso"];
+        } catch (PDOException $e) {
+            return ["erro" => "Erro ao adicionar item: " . $e->getMessage()];
+        }
     }
 
     public function listarPorPedido($pedido_id) {
-        $query = "SELECT * FROM pedido_itens WHERE pedido_id = ?";
-        $stmt = $this->conn->prepare($query);
+        $stmt = $this->pdo->prepare("SELECT * FROM pedido_itens WHERE pedido_id = ?");
         $stmt->execute([$pedido_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function adicionarItem($data) {
-        $query = "INSERT INTO pedido_itens (pedido_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)";
-        $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$data['pedido_id'], $data['produto_id'], $data['quantidade'], $data['preco_unitario']]);
-    }
-
     public function atualizarItem($id, $data) {
-        $query = "UPDATE pedido_itens SET quantidade = ?, preco_unitario = ? WHERE id = ?";
-        $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$data['quantidade'], $data['preco_unitario'], $id]);
+        try {
+            $stmt = $this->pdo->prepare("UPDATE pedido_itens SET quantidade = ?, preco = ? WHERE id = ?");
+            $stmt->execute([
+                $data['quantidade'],
+                $data['preco'],
+                $id
+            ]);
+
+            return ["mensagem" => "Item atualizado com sucesso"];
+        } catch (PDOException $e) {
+            return ["erro" => "Erro ao atualizar item: " . $e->getMessage()];
+        }
     }
 
     public function removerItem($id) {
-        $query = "DELETE FROM pedido_itens WHERE id = ?";
-        $stmt = $this->conn->prepare($query);
-        return $stmt->execute([$id]);
+        try {
+            $stmt = $this->pdo->prepare("DELETE FROM pedido_itens WHERE id = ?");
+            $stmt->execute([$id]);
+
+            return ["mensagem" => "Item removido com sucesso"];
+        } catch (PDOException $e) {
+            return ["erro" => "Erro ao remover item: " . $e->getMessage()];
+        }
     }
 }
-
