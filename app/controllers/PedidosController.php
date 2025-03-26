@@ -79,7 +79,7 @@ class PedidosController {
         $pedidos = $this->pedidoModel->buscarTodos();
         echo json_encode($pedidos);
     }
-
+/*
     public function atualizar($id) {
         $data = json_decode(file_get_contents("php://input"), true);
 
@@ -97,7 +97,7 @@ class PedidosController {
         }
 
         echo json_encode(["mensagem" => "Pedido atualizado com sucesso"]);
-    }
+    }*/
 
     // Deletar um pedido existente
     public function deletar($id) {
@@ -110,7 +110,33 @@ class PedidosController {
 
         echo json_encode(["mensagem" => "Pedido deletado com sucesso"]);
     }
-
+    public function atualizar($pedido_id) {
+        $data = json_decode(file_get_contents("php://input"), true);
+    
+        if (!isset($data['cliente_id'], $data['itens']) || !is_array($data['itens'])) {
+            echo json_encode(["erro" => "Cliente ID e itens são obrigatórios"]);
+            http_response_code(400);
+            exit;
+        }
+    
+        // Verificar se o pedido existe
+        $pedidoExistente = $this->pedidoModel->buscarPorId($pedido_id);
+        if (!$pedidoExistente) {
+            echo json_encode(["erro" => "Pedido não encontrado."]);
+            http_response_code(404);
+            exit;
+        }
+    
+        // Atualizar o pedido principal
+        $resultado = $this->pedidoModel->atualizar($pedido_id, $data);
+        if (isset($resultado['erro'])) {
+            echo json_encode(["erro" => $resultado['erro']]);
+            http_response_code(500);
+            exit;
+        }
+    
+        echo json_encode(["mensagem" => "Pedido atualizado com sucesso"]);
+    }
 
     
 }

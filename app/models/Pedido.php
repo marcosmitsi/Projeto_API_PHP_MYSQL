@@ -127,6 +127,48 @@ class Pedido {
                 return ["erro" => $e->getMessage()];
             }
         }
+
+        public function atualizar($pedido_id, $data) {
+            try {
+                $this->pdo->beginTransaction();
+        
+                // Atualizar informações do pedido
+                $stmt = $this->pdo->prepare("UPDATE pedidos SET cliente_id = ? WHERE id = ?");
+                $stmt->execute([$data['cliente_id'], $pedido_id]);
+        
+                // Remover itens antigos do pedido
+                $stmt = $this->pdo->prepare("DELETE FROM pedido_itens WHERE pedido_id = ?");
+                $stmt->execute([$pedido_id]);
+        
+                // Inserir novos itens do pedido
+                $total = 0;
+                foreach ($data['itens'] as $item) {
+                    $stmt = $this->pdo->prepare("SELECT preco FROM produtos WHERE id = ?");
+                    $stmt->execute([$item['produto_id']]);
+                    $produto = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+                    if (!$produto) {
+                        throw new Exception("Produto ID {$item['produto_id']} não encontrado.");
+                    }
+        
+                    $subtotal = $produto['preco'] * $item['quantidade'];
+                    $total += $subtotal;
+        
+                    $stmt = $this->pdo->prepare("INSERT INTO pedido_itens (pedido_id, produto_id, quantidade, preco_unitario, subtotal) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->execute([$pedido_id, $item['produto_id'], $item['quantidade'], $produto['preco'], $subtotal]);
+                }
+        
+                // Atualizar o total do pedido
+                $stmt = $this->pdo->prepare("UPDATE pedidos SET total = ? WHERE id = ?");
+                $stmt->execute([$total, $pedido_id]);
+        
+                $this->pdo->commit();
+                return ["mensagem" => "Pedido atualizado com sucesso"];
+            } catch (Exception $e) {
+                $this->pdo->rollBack();
+                return ["erro" => $e->getMessage()];
+            }
+        }
         
     }    
 
