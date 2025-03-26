@@ -96,5 +96,37 @@ class Pedido {
     
             return $pedidos;
         }
+
+        public function deletar($pedido_id) {
+            try {
+                // Iniciar transação para garantir a integridade dos dados
+                $this->pdo->beginTransaction();
+        
+                // Deletar os itens associados ao pedido
+                $stmt = $this->pdo->prepare("DELETE FROM pedido_itens WHERE pedido_id = ?");
+                $stmt->execute([$pedido_id]);
+        
+                // Deletar o pedido
+                $stmt = $this->pdo->prepare("DELETE FROM pedidos WHERE id = ?");
+                $stmt->execute([$pedido_id]);
+        
+                // Verificar se algum registro foi afetado
+                if ($stmt->rowCount() === 0) {
+                    // Nenhum registro foi deletado, desfazendo a transação
+                    $this->pdo->rollBack();
+                    return ["erro" => "Pedido não encontrado."];
+                }
+        
+                // Confirmar a transação
+                $this->pdo->commit();
+        
+                return ["mensagem" => "Pedido deletado com sucesso!"];
+            } catch (Exception $e) {
+                // Reverter a transação em caso de erro
+                $this->pdo->rollBack();
+                return ["erro" => $e->getMessage()];
+            }
+        }
+        
     }    
 
