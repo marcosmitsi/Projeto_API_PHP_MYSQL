@@ -63,5 +63,38 @@ class Pedido {
                 return ["erro" => $e->getMessage()];
             }
         }
+
+        public function buscarPorId($id) {
+            $stmt = $this->pdo->prepare("SELECT * FROM pedidos WHERE id = ?");
+            $stmt->execute([$id]);
+            $pedido = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            if ($pedido) {
+                // Buscar itens do pedido
+                $stmt = $this->pdo->prepare("SELECT * FROM pedido_itens WHERE pedido_id = ?");
+                $stmt->execute([$id]);
+                $itens = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+                $pedido['itens'] = $itens;
+            }
+    
+            return $pedido;
+        }
+    
+        public function buscarTodos() {
+            $stmt = $this->pdo->query("SELECT * FROM pedidos");
+            $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            foreach ($pedidos as &$pedido) {
+                // Buscar itens de cada pedido
+                $stmt = $this->pdo->prepare("SELECT * FROM pedido_itens WHERE pedido_id = ?");
+                $stmt->execute([$pedido['id']]);
+                $itens = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+                $pedido['itens'] = $itens;
+            }
+    
+            return $pedidos;
+        }
     }    
 

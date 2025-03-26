@@ -40,7 +40,7 @@ if ($uri == '/api/produtos' && $method == 'GET') {
 
 // Rotas para pedidos
 if ($uri == '/api/pedidos' && $method == 'GET') {
-    $pedidosController->listar();
+    $pedidosController->buscar();
     exit;
 } elseif (preg_match('/\/api\/pedidos\/(\d+)/', $uri, $matches) && $method == 'GET') {
     $pedidosController->buscar($matches[1]);

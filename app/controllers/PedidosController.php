@@ -56,4 +56,27 @@ class PedidosController {
     
         echo json_encode(["mensagem" => "Pedido criado com sucesso", "pedido_id" => $pedidoId]);
     }
+
+    public function buscar($id = null) {
+        if ($id) {
+            $this->buscarPorId($id);
+        } else {
+            $this->buscarTodos();
+        }
+    }
+
+    public function buscarPorId($id) {
+        $pedido = $this->pedidoModel->buscarPorId($id);
+        if ($pedido) {
+            echo json_encode($pedido);
+        } else {
+            http_response_code(404);
+            echo json_encode(["erro" => "Pedido não encontrado."]);
+        }
+    }
+
+    public function buscarTodos() {
+        $pedidos = $this->pedidoModel->buscarTodos();
+        echo json_encode($pedidos);
+    }
 }
