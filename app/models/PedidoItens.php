@@ -20,10 +20,12 @@ class PedidoItens {
         return null; // Caso o produto não seja encontrado
     }
 
-
     public function adicionarItem($data) {
         try {
-            $stmt = $this->pdo->prepare("INSERT INTO pedido_itens (pedido_id, produto_id, quantidade, preco) VALUES (?, ?, ?, ?)");
+            $stmt = $this->pdo->prepare("
+                INSERT INTO pedido_itens (pedido_id, produto_id, quantidade, preco)
+                VALUES (?, ?, ?, ?)
+            ");
             $stmt->execute([
                 $data['pedido_id'], 
                 $data['produto_id'], 
@@ -38,14 +40,24 @@ class PedidoItens {
     }
 
     public function listarPorPedido($pedido_id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM pedido_itens WHERE pedido_id = ?");
+        // ✅ Corrigido: faz JOIN com a tabela produtos para trazer o nome real do produto
+        $stmt = $this->pdo->prepare("
+            SELECT pi.*, p.nome AS nome_produto
+            FROM pedido_itens pi
+            JOIN produtos p ON pi.produto_id = p.id
+            WHERE pi.pedido_id = ?
+        ");
         $stmt->execute([$pedido_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function atualizarItem($id, $data) {
         try {
-            $stmt = $this->pdo->prepare("UPDATE pedido_itens SET quantidade = ?, preco = ? WHERE id = ?");
+            $stmt = $this->pdo->prepare("
+                UPDATE pedido_itens
+                SET quantidade = ?, preco = ?
+                WHERE id = ?
+            ");
             $stmt->execute([
                 $data['quantidade'],
                 $data['preco'],

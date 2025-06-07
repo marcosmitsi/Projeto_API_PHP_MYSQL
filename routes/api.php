@@ -12,9 +12,7 @@ $uri = str_replace('/kidelicia/public', '', $uri);  // Remover '/kidelicia/publi
 $uri = rtrim($uri, '/');  // Remover barra no final, caso exista
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Exibir a URL e método para depuração (ative para testar)
-// var_dump($uri, $method); die(); 
-
+// Instanciando controllers
 $produtosController = new ProdutosController();
 $pedidosController = new PedidosController();
 $pedidoItensController = new PedidoItensController();
@@ -53,6 +51,11 @@ if ($uri == '/api/pedidos' && $method == 'GET') {
     exit;
 } elseif (preg_match('/\/api\/pedidos\/(\d+)/', $uri, $matches) && $method == 'DELETE') {
     $pedidosController->deletar($matches[1]);
+    exit;
+} 
+// ✅ NOVA ROTA: visualizar pedido com itens
+elseif (preg_match('/\/api\/pedidos\/visualizar\/(\d+)/', $uri, $matches) && $method == 'GET') {
+    $pedidosController->visualizar($matches[1]);
     exit;
 }
 
